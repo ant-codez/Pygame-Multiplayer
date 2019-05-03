@@ -1,7 +1,7 @@
-import socket, time, pickle, random, math
+import socket, time, pickle, random, math, pygame
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-serversocket.bind(("10.113.6.22", 5555))
+serversocket.bind(("10.113.4.4", 5555))
 serversocket.listen(2)
 arr = [400,400,400,400,0,0]
 connection = []
@@ -10,10 +10,30 @@ speed = 20
 ball_speed = 8.0
 direction = random.randrange(-45, 45)
 
+#create sound channel
+pygame.init()
+pygame.mixer.pre_init(44100, 16, 2, 4096)
+
+def create_sounds():
+    sounds = []
+    paddle = []
+
+    sounds.append(pygame.mixer.Sound('hit0.wav'))
+    sounds.append(pygame.mixer.Sound('hit1.wav'))
+    sounds.append(pygame.mixer.Sound('hit2.wav'))
+    sounds.append(pygame.mixer.Sound('hit3.wav'))
+    sounds.append(pygame.mixer.Sound('hit4.wav'))
+
+    paddle.append(pygame.mixer.Sound('hit_paddle.wav'))
+
+    return sounds, paddle
+
+sound_bounce, sound_paddle = create_sounds()
+
 def process_positions(array, player_1, player_2):
     #info[0] = key_up
     #info[1] = key_down
-    global direction, ball_speed
+    global direction, ball_speed, sound_bounce, sound_paddle
     direction_radians = math.radians(direction)
 
     '''PADDLE MOVING'''
@@ -38,6 +58,7 @@ def process_positions(array, player_1, player_2):
     if array[2] >= 595 or array[2] <= 0:
         direction = (180 - direction) % 360
         ball_speed *= 1.1
+        sound_bounce[random.randrange(len(sound_bounce))].play()
 
     if array[3] >= 795 or array[3] <= 0:
         if array[3] > 795:
@@ -60,10 +81,13 @@ def process_positions(array, player_1, player_2):
     '''PADDLE DETECTION'''
     if array[3]<20 and (array[0]<array[2] and array[0]+60>array[2]):
         direction = (360 - direction) % 360
-        ball_speed *= 1.2
+        ball_speed *= 1.1
+        sound_paddle[0].play()
+
     if array[3]>780 and (array[1]<array[2] and array[1]+60>array[2]):
         direction = (360 - direction) % 360
-        ball_speed *= 1.2
+        ball_speed *= 1.1
+        sound_paddle[0].play()
 
     #info = [player_1_y, player_2_y, ball_y, ball_x, score_1, score_2]
 
@@ -81,6 +105,9 @@ def recieve_information():
     player_2_info = pickle.loads(connection[1].recv(1024))
 
     return player_1_info, player_2_info
+
+
+
 
 
 while True:

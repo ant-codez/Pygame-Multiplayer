@@ -17,7 +17,7 @@ clock = pygame.time.Clock()
 gameDisplay = pygame.display.set_mode((display_width, display_height))
 
 clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-clientsocket.connect(("10.113.6.22", 5555))
+clientsocket.connect(("10.113.4.4", 5555))
 
 
 def message_display(txt,x,y):
@@ -61,21 +61,19 @@ def main():
 
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
                     key_up = True
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     key_down = True
             if event.type == pygame.KEYUP:
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
                     key_up = False
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     key_down = False
 
         arr = [key_up, key_down]
         data_arr = pickle.dumps(arr)
         clientsocket.send(data_arr)
-
-
 
     #info = [player_1_y, player_2_y, ball_y, ball_x, score_1, score_2]
 
