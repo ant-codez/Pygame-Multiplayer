@@ -1,8 +1,13 @@
 import socket, time, pickle, random, math, pygame
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-serversocket.bind(("10.113.4.4", 5555))
-serversocket.listen(2)
+#get ip address of Network server is on
+hostname = socket.gethostname()
+print (hostname)
+ip_address = socket.gethostbyname(hostname)
+serversocket.bind((ip_address, 5555))
+
+serversocket.listen()
 arr = [400,400,400,400,0,0]
 connection = []
 speed = 20
@@ -106,6 +111,10 @@ def recieve_information():
 
     return player_1_info, player_2_info
 
+def end_game(connections):
+    connection.pop()
+    connection.pop()
+    
 
 
 
@@ -119,5 +128,8 @@ while True:
     connection[1].send(data_arr)
 
     player1, player2 = recieve_information()
+
+    if player1 == "END" or player2 == "END":
+        arr = [400,400,400,400,0,0]
 
     arr = process_positions(arr,player1, player2)
