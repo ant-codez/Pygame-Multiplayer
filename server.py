@@ -130,6 +130,7 @@ while True:
     player1, player2 = recieve_information()
 
     if player1 == "END" or player2 == "END":
+        #end_game(connection)
         arr = [400,400,400,400,0,0]
 
     arr = process_positions(arr,player1, player2)

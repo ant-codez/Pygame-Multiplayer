@@ -21,6 +21,7 @@ clock = pygame.time.Clock()
 clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clientsocket.connect((ip_address, 5555))
 
+global message
 
 def message_display(txt,x,y):
     font = pygame.font.SysFont("comicsans", 50)
@@ -91,16 +92,19 @@ def main():
             #game_finished = True
             end = pickle.dumps("END")
             clientsocket.send(end)
+            game_finished == True
     #info = [player_1_y, player_2_y, ball_y, ball_x, score_1, score_2]
 
 def menu():
     run = True
-    message = "Click to find a Pong game!"
-    while run:
+    while run == True:
         clock.tick(60)
         gameDisplay.fill((128, 128, 128))
         font = pygame.font.SysFont("comicsans", 60)
-        text = font.render(message, 1, (255,0,0))
+        try:
+            text = font.render(message, 1, (255,0,0))
+        except:
+            text = font.render("Click to play!", 1, (255,0,0))
         gameDisplay.blit(text, (155, display_height / 2))
         pygame.display.update()
 
@@ -111,7 +115,6 @@ def menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 run = False
 
-    message = main()
-
+    main()
 while True:
     menu()
