@@ -1,10 +1,18 @@
+"""
+This is the client file and will send button press signals from both paddles to the server for calculations.
+The client file recieves the positions of the ball and both players from the server.
+The client file also draws everything on the screen.
+"""
+
 import pygame, socket, time, pickle
 
 pygame.init()
 
+#get host name of wifi computer is connected too
 hostname = socket.gethostname()
 ip_address = socket.gethostbyname(hostname)
 
+#colors
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
@@ -12,17 +20,22 @@ BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0,255,0)
 
+#window sizes
 display_width = 800
 display_height = 600
 
+#Lets pygame know what window to draw things too
 gameDisplay = pygame.display.set_mode((display_width, display_height))
+#initalize clock for FPS
 clock = pygame.time.Clock()
 
+#create connection to server socket
 clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clientsocket.connect((ip_address, 5555))
 
 global message
 
+#Draw images on the screen
 def message_display(txt,x,y):
     font = pygame.font.SysFont("comicsans", 50)
     if x == 500:
@@ -31,21 +44,25 @@ def message_display(txt,x,y):
         label = font.render(str(txt), 1, RED)
     gameDisplay.blit(label, (x,y))
 
+#recieve and unpickle data from server
 def recieve_data():
     data = clientsocket.recv(1024)
     data = pickle.loads(data)
 
     return data
 
+#draw paddles on screen
 def draw_paddles(x,y,p):
     if p == 1:
         pygame.draw.rect(gameDisplay, RED, [x, y, 10, 60])
     if p == 2:
         pygame.draw.rect(gameDisplay, BLUE, [x, y, 10, 60])
 
+#draw ball on screen
 def draw_ball(x,y):
     pygame.draw.circle(gameDisplay, BLACK, [int(x),int(y)], 5)
 
+#main game loop
 def main():
     game_finished = False
     key_up = False
@@ -67,6 +84,7 @@ def main():
         message_display(info[5], 500, 50)
         pygame.display.update()
 
+        #wait for key press activity from client
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -87,7 +105,7 @@ def main():
         data_arr = pickle.dumps([key_up, key_down])
         clientsocket.send(data_arr)
 
-    
+        #reset game if score reaches 11
         if (info[4] == 11 or info[5] == 11):
             #game_finished = True
             end = pickle.dumps("END")
@@ -95,6 +113,7 @@ def main():
             game_finished == True
     #info = [player_1_y, player_2_y, ball_y, ball_x, score_1, score_2]
 
+#main menu loop
 def menu():
     run = True
     while run == True:

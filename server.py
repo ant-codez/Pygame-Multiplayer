@@ -1,14 +1,26 @@
+"""
+This file handles the server connections for 2 clients.
+The server calculates the postions of the ball when it bounces off Walls or paddles
+The server returns postions of the Ball, both players, and the Score
+"""
+
 import socket, time, pickle, random, math, pygame
 
+#create socket and initalize connection type
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#get ip address of Network server is on
+#get hostname of Network server is on
 hostname = socket.gethostname()
 print (hostname)
+#use hostname to get ipaddress
 ip_address = socket.gethostbyname(hostname)
+#bind socket to port and ip address
 serversocket.bind((ip_address, 5555))
 
+#listen for connections
 serversocket.listen()
+#Create list of postions to be sent to client 
 arr = [400,400,400,400,0,0]
+#list of connections
 connection = []
 speed = 20
 
@@ -19,22 +31,24 @@ direction = random.randrange(-45, 45)
 pygame.init()
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 
+#Create list of sounds
 def create_sounds():
     sounds = []
     paddle = []
 
-    sounds.append(pygame.mixer.Sound('hit0.wav'))
-    sounds.append(pygame.mixer.Sound('hit1.wav'))
-    sounds.append(pygame.mixer.Sound('hit2.wav'))
-    sounds.append(pygame.mixer.Sound('hit3.wav'))
-    sounds.append(pygame.mixer.Sound('hit4.wav'))
+    sounds.append(pygame.mixer.Sound('sounds/hit0.wav'))
+    sounds.append(pygame.mixer.Sound('sounds/hit1.wav'))
+    sounds.append(pygame.mixer.Sound('sounds/hit2.wav'))
+    sounds.append(pygame.mixer.Sound('sounds/hit3.wav'))
+    sounds.append(pygame.mixer.Sound('sounds/hit4.wav'))
 
-    paddle.append(pygame.mixer.Sound('hit_paddle.wav'))
+    paddle.append(pygame.mixer.Sound('sounds/hit_paddle.wav'))
 
     return sounds, paddle
 
 sound_bounce, sound_paddle = create_sounds()
 
+#This is where the server calculates positons and returns the back to the client
 def process_positions(array, player_1, player_2):
     #info[0] = key_up
     #info[1] = key_down
@@ -65,6 +79,7 @@ def process_positions(array, player_1, player_2):
         ball_speed *= 1.1
         sound_bounce[random.randrange(len(sound_bounce))].play()
 
+    #ball score
     if array[3] >= 795 or array[3] <= 0:
         if array[3] > 795:
             array[4] += 1
@@ -98,6 +113,7 @@ def process_positions(array, player_1, player_2):
 
     return array
 
+#wait for two clients to connect before we start the game
 def waiting_for_connections():
     while len(connection)<2:
         conn, addr = serversocket.accept()
@@ -105,20 +121,14 @@ def waiting_for_connections():
         print(conn)
         print(connection)
 
+#unpickle data from client 
 def recieve_information():
     player_1_info = pickle.loads(connection[0].recv(1024))
     player_2_info = pickle.loads(connection[1].recv(1024))
 
     return player_1_info, player_2_info
 
-def end_game(connections):
-    connection.pop()
-    connection.pop()
-    
-
-
-
-
+#main server loop
 while True:
     waiting_for_connections()
 
