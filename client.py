@@ -9,8 +9,8 @@ import pygame, socket, time, pickle
 pygame.init()
 
 #get host name of wifi computer is connected too
-hostname = socket.gethostname()
-ip_address = socket.gethostbyname(hostname)
+#hostname = socket.gethostname()
+#ip_address = socket.gethostbyname(hostname)
 
 #colors
 RED = (255, 0, 0)
@@ -31,7 +31,7 @@ clock = pygame.time.Clock()
 
 #create connection to server socket
 clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-clientsocket.connect((ip_address, 5555))
+clientsocket.connect(('10.133.5.26', 5555))
 
 global message
 
