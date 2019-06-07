@@ -31,7 +31,7 @@ clock = pygame.time.Clock()
 
 #create connection to server socket
 clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-clientsocket.connect(('10.133.5.26', 5555))
+clientsocket.connect(('10.113.5.26', 5555))
 
 global message
 
